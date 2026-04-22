@@ -52,18 +52,56 @@ async function sendEligibleEmail({
   invoiceUrl?: string;
   draftOrderName?: string;
 }) {
-  await transporter.sendMail({
-    from: `"Your Brand" <${process.env.SMTP_EMAIL}>`,
-    to,
-    subject: "Your draft order has been created",
-    html: `
-      <p>Hi ${[firstName, lastName].filter(Boolean).join(" ") || "there"},</p>
-      <p>Your request is eligible and your draft order has been created successfully.</p>
-      ${draftOrderName ? `<p><strong>Draft Order:</strong> ${draftOrderName}</p>` : ""}
-      ${invoiceUrl ? `<p><a href="${invoiceUrl}">Click here to complete your order</a></p>` : ""}
-      <p>Thank you.</p>
-    `,
-  });
+  console.log("📧 Attempting to send email...");
+  console.log("➡️ To:", to);
+  console.log("➡️ SMTP_EMAIL:", process.env.SMTP_EMAIL);
+
+  try {
+    const info = await transporter.sendMail({
+      from: `"Your Brand" <${process.env.SMTP_EMAIL}>`,
+      to,
+      subject: "Your draft order has been created",
+      html: `
+        <p>Hi ${[firstName, lastName].filter(Boolean).join(" ") || "there"},</p>
+        <p>Your request is eligible and your draft order has been created successfully.</p>
+        ${draftOrderName ? `<p><strong>Draft Order:</strong> ${draftOrderName}</p>` : ""}
+        ${invoiceUrl ? `<p><a href="${invoiceUrl}">Click here to complete your order</a></p>` : ""}
+        <p>Thank you.</p>
+      `,
+    });
+
+    console.log("✅ Email sent successfully!");
+    console.log("📨 Message ID:", info.messageId);
+
+    if (info.response) {
+      console.log("📡 SMTP Response:", info.response);
+    }
+
+    return {
+      success: true,
+      info,
+    };
+  } catch (error: any) {
+    console.error("❌ Email sending failed!");
+    console.error("Error message:", error.message);
+
+    if (error.code) {
+      console.error("Error code:", error.code);
+    }
+
+    if (error.response) {
+      console.error("SMTP response:", error.response);
+    }
+
+    if (error.stack) {
+      console.error("Stack trace:", error.stack);
+    }
+
+    return {
+      success: false,
+      error,
+    };
+  }
 }
 
 async function sendNotEligibleEmail({
@@ -75,17 +113,55 @@ async function sendNotEligibleEmail({
   firstName: string;
   lastName: string;
 }) {
-  await transporter.sendMail({
-    from: `"Your Brand" <${process.env.SMTP_EMAIL}>`,
-    to,
-    subject: "Regarding your request",
-    html: `
-      <p>Hi ${[firstName, lastName].filter(Boolean).join(" ") || "there"},</p>
-      <p>Thank you for your interest.</p>
-      <p>Unfortunately, you are not eligible based on the requested quantity.</p>
-      <p>If you have any questions, please reply to this email.</p>
-    `,
-  });
+  console.log("📧 Attempting to send NOT ELIGIBLE email...");
+  console.log("➡️ To:", to);
+  console.log("➡️ SMTP_EMAIL:", process.env.SMTP_EMAIL);
+
+  try {
+    const info = await transporter.sendMail({
+      from: `"Your Brand" <${process.env.SMTP_EMAIL}>`,
+      to,
+      subject: "Regarding your request",
+      html: `
+        <p>Hi ${[firstName, lastName].filter(Boolean).join(" ") || "there"},</p>
+        <p>Thank you for your interest.</p>
+        <p>Unfortunately, you are not eligible based on the requested quantity.</p>
+        <p>If you have any questions, please reply to this email.</p>
+      `,
+    });
+
+    console.log("✅ Not Eligible email sent successfully!");
+    console.log("📨 Message ID:", info.messageId);
+
+    if (info.response) {
+      console.log("📡 SMTP Response:", info.response);
+    }
+
+    return {
+      success: true,
+      info,
+    };
+  } catch (error: any) {
+    console.error("❌ Not Eligible email failed!");
+    console.error("Error message:", error.message);
+
+    if (error.code) {
+      console.error("Error code:", error.code);
+    }
+
+    if (error.response) {
+      console.error("SMTP response:", error.response);
+    }
+
+    if (error.stack) {
+      console.error("Stack trace:", error.stack);
+    }
+
+    return {
+      success: false,
+      error,
+    };
+  }
 }
 
 async function sendProcessingFailedEmail({
