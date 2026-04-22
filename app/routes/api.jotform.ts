@@ -123,7 +123,7 @@ async function createDraftOrder({
   requestedUnits: { pink: number; white: number };
 }) {
   const lineItems = buildLineItems(requestedUnits);
-
+  console.log("Constructed line items for draft order:", lineItems);
   if (!lineItems.length) {
     return {
       success: false,
@@ -162,6 +162,8 @@ async function createDraftOrder({
     },
   };
 
+  console.log("Sending draft order creation request to Shopify with variables:", variables);
+  console.log("Shopify API endpoint:", `https://${process.env.SHOPIFY_STORE_URL}/admin/api/2026-04/graphql.json`);
   const res = await fetch(`https://${process.env.SHOPIFY_STORE_URL}/admin/api/2026-04/graphql.json`, {
     method: "POST",
     headers: {
